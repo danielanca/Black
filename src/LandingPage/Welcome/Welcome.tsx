@@ -9,6 +9,15 @@ interface playersListProps {
     nickName: string;
     channelRoom: string;
 }
+type Card = {
+    cardID: string;
+    cardValue: number;
+};
+type CardsPlayers = {
+    socketID: string;
+    nickName: string;
+    cards: Card[];
+};
 const getExistingNickName = () => {
     let credentialsSaved = getCookie('blackJackDaniel');
     if (credentialsSaved) {
@@ -29,18 +38,14 @@ const getExistingRoomChannel = () => {
         return '';
     }
 };
-const Welcome = ({ eventHandler }: WelcomeProps) => {
+const Welcome = ({ eventHandler, playerData, setPlayerData, cards, setCards }: WelcomeProps) => {
     const ourContext = useContext(Context);
-    const [playerData, setPlayerData] = useState<PlayerProps>({
-        nickName: '',
-        roomChannel: ''
-    });
-    console.log('HAHA IT CHANGED NICKNAME TO emmpty ');
+
     const [playersOnLabel, setPlayersOnLabel] = useState<playersListProps[]>([]);
 
     const inputHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = event.target;
-        console.log('Insert:', value);
+
         setPlayerData((playerData) => ({ ...playerData, [name]: value }));
     };
 
@@ -48,6 +53,16 @@ const Welcome = ({ eventHandler }: WelcomeProps) => {
         ourContext.socket.emit('howManyPlayers');
         console.log('[Welcome] => howManyPlayers useEffect credentials:', playerData);
     }, []);
+
+    useEffect(() => {
+        ourContext.socket.on('playerCards', (data: any) => {
+            console.log('playerCards:', data);
+            let cardsPlayerIncoming: CardsPlayers[] = JSON.parse(data.payload);
+
+            console.log('DA DA from WELCOME', JSON.stringify(data));
+            setCards(cardsPlayerIncoming);
+        });
+    }, [ourContext.socket]);
 
     useEffect(() => {
         ourContext.socket.on('roomJoinStatus', (data: any) => {
@@ -60,11 +75,7 @@ const Welcome = ({ eventHandler }: WelcomeProps) => {
                         roomChannel: data.roomChannel
                     })
                 );
-                // setPlayerData((playerData) => ({
-                //     ...playerData,
-                //     nickName: data.nickName,
-                //     roomChannel: data.roomChannel
-                // }));
+
                 eventHandler({
                     responseMessage: data.message,
                     nickName: data.nickName,
