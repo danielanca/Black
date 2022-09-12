@@ -10,6 +10,21 @@ interface PlayerProps {
     nickName: string;
     roomChannel: string;
 }
+interface GameplayProps {
+    playerInfo: {
+        nickName: string;
+        roomChannel: string;
+    };
+}
+type Card = {
+    cardID: string;
+    cardValue: number;
+};
+type CardsPlayers = {
+    socketID: string;
+    nickName: string;
+    cards: Card[];
+};
 const socket = io('http://localhost:9001');
 
 export const Context = createContext({ socket });
@@ -18,6 +33,7 @@ const LandingPage = () => {
     const [playerData, setPlayerData] = useState<PlayerProps>({ nickName: '', roomChannel: '' });
     const [message, setMessage] = useState<string>('No message yet');
     const [gamePlay, setGamePlay] = useState<boolean>(false);
+    const [cards, setCards] = useState<CardsPlayers[]>([]);
 
     useEffect(() => {
         socket.on('receive_message', (data) => {
@@ -57,9 +73,17 @@ const LandingPage = () => {
         <>
             <Context.Provider value={{ socket }}>
                 {!gamePlay ? (
-                    <Welcome eventHandler={setData} />
+                    <Welcome
+                        playerData={playerData}
+                        setPlayerData={setPlayerData}
+                        eventHandler={setData}
+                        cards={cards}
+                        setCards={setCards}
+                    />
                 ) : (
                     <Gameplay
+                        cards={cards}
+                        setCards={setCards}
                         playerInfo={{
                             nickName: playerData.nickName,
                             roomChannel: playerData.roomChannel

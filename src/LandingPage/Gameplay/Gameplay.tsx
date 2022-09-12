@@ -8,23 +8,36 @@ interface GameplayProps {
         nickName: string;
         roomChannel: string;
     };
+    cards: CardsPlayers[];
+    setCards: React.Dispatch<React.SetStateAction<CardsPlayers[]>>;
 }
+type Card = {
+    cardID: string;
+    cardValue: number;
+};
+type CardsPlayers = {
+    socketID: string;
+    nickName: string;
+    cards: Card[];
+};
 
-const Gameplay = ({ playerInfo }: GameplayProps) => {
+const Gameplay = ({ playerInfo, cards, setCards }: GameplayProps) => {
     const ourContext = useContext(Context);
     const { nickName, roomChannel } = playerInfo;
 
     console.log('GAMEPLAY:', nickName);
-    const [cards, setCards] = useState([
-        { cardID: '9-H', cardValue: 9 },
-        { cardID: '4-H', cardValue: 9 }
-    ]);
+    // const [cards, setCards] = useState<CardsPlayers[]>([
+
+    // ]);
 
     const [gameplayStatus, setGameplayStatus] = useState();
 
-    const hitAction = () => {};
-
-    const stayAction = () => {};
+    const fireAction = (event: string) => {
+        ourContext.socket.emit(
+            'EVENT_ACTION',
+            JSON.stringify({ nickName, roomChannel, actionEvent: event })
+        );
+    };
 
     useEffect(() => {
         ourContext.socket.emit('PLAYER_READY', { initialState: true, playerInfo });
@@ -35,7 +48,21 @@ const Gameplay = ({ playerInfo }: GameplayProps) => {
                 setCards(data.card);
             }
         });
+
+        ourContext.socket.on('playerCards', (data: any) => {
+            console.log('playerCards:', data);
+            let cardsPlayerIncoming: CardsPlayers[] = JSON.parse(data.payload);
+
+            console.log('DA DA:', cardsPlayerIncoming);
+            setCards(cardsPlayerIncoming);
+        });
     }, [ourContext.socket]);
+
+    useEffect(() => {
+        console.log('NANE:', cards);
+
+        console.log('NANEx:', cards.find((player) => player.nickName === nickName)?.cards);
+    }, [cards]);
 
     return (
         <div className={styles.gameContainer}>
@@ -45,20 +72,26 @@ const Gameplay = ({ playerInfo }: GameplayProps) => {
             </div>
 
             <div className={styles.controls}>
-                <button className={styles.hitButton}>{'HIT'}</button>
-                <button className={styles.stayButton}>{'STAY'}</button>
+                <button onClick={fireAction.bind(1, 'HIT')} className={styles.hitButton}>
+                    {'HIT'}
+                </button>
+                <button onClick={fireAction.bind(1, 'STAY')} className={styles.stayButton}>
+                    {'STAY'}
+                </button>
             </div>
             <div className={styles.uRcenterOfUniverse}>
                 <div className={styles.myDeck}>
-                    {cards.map((item) => {
-                        return (
-                            <img
-                                className={styles.card}
-                                src={cardImageLoad(item.cardID)}
-                                alt={item.cardID}
-                            />
-                        );
-                    })}
+                    {cards
+                        .find((player) => player.nickName === nickName)
+                        ?.cards.map(({ cardID }: Card) => {
+                            return (
+                                <img
+                                    className={styles.card}
+                                    src={cardImageLoad(cardID)}
+                                    alt={'Player card blackjack'}
+                                />
+                            );
+                        })}
                 </div>
             </div>
         </div>
