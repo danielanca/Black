@@ -17,11 +17,12 @@ type CardsPlayers = {
     socketID: string;
     nickName: string;
     cards: Card[];
+    dealer?: string;
+    myTurn?: string;
 };
 const getExistingNickName = () => {
     let credentialsSaved = getCookie('blackJackDaniel');
     if (credentialsSaved) {
-        console.log('Credentials in Cookie:', credentialsSaved);
         var { nickName } = JSON.parse(credentialsSaved);
         return nickName;
     } else {
@@ -31,7 +32,7 @@ const getExistingNickName = () => {
 const getExistingRoomChannel = () => {
     let credentialsSaved = getCookie('blackJackDaniel');
     if (credentialsSaved) {
-        console.log('Credentials in Cookie:', credentialsSaved);
+        // console.log('Credentials in Cookie:', credentialsSaved);
         var { roomChannel } = JSON.parse(credentialsSaved);
         return roomChannel;
     } else {
@@ -51,17 +52,21 @@ const Welcome = ({ eventHandler, playerData, setPlayerData, cards, setCards }: W
 
     useEffect(() => {
         ourContext.socket.emit('howManyPlayers');
-        console.log('[Welcome] => howManyPlayers useEffect credentials:', playerData);
     }, []);
 
     useEffect(() => {
-        ourContext.socket.on('playerCards', (data: any) => {
-            console.log('playerCards:', data);
-            let cardsPlayerIncoming: CardsPlayers[] = JSON.parse(data.payload);
-
-            console.log('DA DA from WELCOME', JSON.stringify(data));
-            setCards(cardsPlayerIncoming);
-        });
+        // ourContext.socket.on('playerCards', (data: any) => {
+        //     let cardsPlayerIncoming: CardsPlayers[] = JSON.parse(data.payload);
+        //     if (typeof cardsPlayerIncoming != 'undefined') {
+        //         let theTurn = cardsPlayerIncoming.find(
+        //             (player) => player.nickName === playerData.nickName
+        //         )?.myTurn;
+        //         console.log('THE TURN IS:', theTurn, playerData.nickName);
+        //         // setMyTurn(instanceof theTurn != undefined ? theTurn : 'NO');
+        //     }
+        //     console.log('DA DA from WELCOME', JSON.stringify(data));
+        //     setCards(cardsPlayerIncoming);
+        // });
     }, [ourContext.socket]);
 
     useEffect(() => {
@@ -91,15 +96,10 @@ const Welcome = ({ eventHandler, playerData, setPlayerData, cards, setCards }: W
             });
             setPlayersOnLabel(players);
         });
-
-        console.log(
-            '[Welcome] -> WE RECEIVED SIGNAL TO CONNECT TO ROOM and have playerData',
-            playerData
-        );
     }, [ourContext.socket]);
 
     useEffect(() => {
-        console.log(`  [Welcome] PlayerData changed!`, playerData);
+        // console.log(`  [Welcome] PlayerData changed!`, playerData);
     }, [playerData]);
 
     useEffect(() => {
@@ -115,13 +115,14 @@ const Welcome = ({ eventHandler, playerData, setPlayerData, cards, setCards }: W
     }, []);
 
     const joinRoom = () => {
+        setPlayerData((playerData) => ({ ...playerData, nickName: playerData.nickName }));
         if (playerData.roomChannel !== '' && playerData.nickName !== '') {
             ourContext.socket.emit('joinRoom', {
                 roomChannel: playerData.roomChannel,
                 nickName: playerData.nickName
             });
         } else {
-            console.log('THERE IS NO ROOM SPECIFICATION');
+            // console.log('THERE IS NO ROOM SPECIFICATION');
         }
     };
 
