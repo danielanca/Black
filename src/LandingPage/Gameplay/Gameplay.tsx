@@ -10,6 +10,7 @@ interface GameplayProps {
     };
     cards: CardsPlayers[];
     setCards: React.Dispatch<React.SetStateAction<CardsPlayers[]>>;
+    myTurn?: string;
 }
 type Card = {
     cardID: string;
@@ -19,18 +20,17 @@ type CardsPlayers = {
     socketID: string;
     nickName: string;
     cards: Card[];
+    dealer?: string;
+    myTurn?: string;
 };
 
 const Gameplay = ({ playerInfo, cards, setCards }: GameplayProps) => {
     const ourContext = useContext(Context);
     const { nickName, roomChannel } = playerInfo;
-
+    const opponent = cards.find((player) => player.nickName !== nickName)?.nickName;
+    const [myTurn, setMyTurn] = useState<'YES' | 'NO'>('NO');
     console.log('GAMEPLAY:', nickName);
-    // const [cards, setCards] = useState<CardsPlayers[]>([
-
-    // ]);
-
-    const [gameplayStatus, setGameplayStatus] = useState();
+    console.log('myTurn:', myTurn);
 
     const fireAction = (event: string) => {
         ourContext.socket.emit(
@@ -52,35 +52,60 @@ const Gameplay = ({ playerInfo, cards, setCards }: GameplayProps) => {
         ourContext.socket.on('playerCards', (data: any) => {
             console.log('playerCards:', data);
             let cardsPlayerIncoming: CardsPlayers[] = JSON.parse(data.payload);
+            // if (typeof cardsPlayerIncoming != 'undefined') {
+            //     let theTurn = cardsPlayerIncoming.find((player) => player.nickName === nickName)
+            //         ?.myTurn;
 
-            console.log('DA DA:', cardsPlayerIncoming);
+            //     console.log('THE TURN IS:', theTurn, nickName);
+            //     if (typeof theTurn != 'undefined') {
+            //         setMyTurn('YES');
+            //     }
+            // }
+
+            // console.log('DA DA from WELCOME', JSON.stringify(data));
             setCards(cardsPlayerIncoming);
         });
     }, [ourContext.socket]);
-
-    useEffect(() => {
-        console.log('NANE:', cards);
-
-        console.log('NANEx:', cards.find((player) => player.nickName === nickName)?.cards);
-    }, [cards]);
 
     return (
         <div className={styles.gameContainer}>
             <div className={styles.upperBanner}>
                 <h4 className={styles.roomName}>{`Room: ${roomChannel}`}</h4>
+                <h4 className={styles.roomName}>{`Opponent: ${
+                    typeof opponent === 'undefined' ? 'no-one' : opponent
+                }`}</h4>
                 <p className={styles.nickStyle}>{`Nickname: ${nickName}`}</p>
             </div>
 
-            <div className={styles.controls}>
-                <button onClick={fireAction.bind(1, 'HIT')} className={styles.hitButton}>
-                    {'HIT'}
-                </button>
-                <button onClick={fireAction.bind(1, 'STAY')} className={styles.stayButton}>
-                    {'STAY'}
-                </button>
+            {cards.find((player) => player.nickName === nickName)?.myTurn === 'YES' ? (
+                <div className={styles.controls}>
+                    <button onClick={fireAction.bind(1, 'HIT')} className={styles.hitButton}>
+                        {'HIT'}
+                    </button>
+                    <button onClick={fireAction.bind(1, 'STAY')} className={styles.stayButton}>
+                        {'STAY'}
+                    </button>
+                </div>
+            ) : (
+                ''
+            )}
+            <div className={styles.theOpponentContainer}>
+                <div className={styles.Deck}>
+                    {cards
+                        .find((player) => player.nickName !== nickName)
+                        ?.cards.map(({ cardID }: Card) => {
+                            return (
+                                <img
+                                    className={styles.oponentCard}
+                                    src={cardImageLoad(cardID)}
+                                    alt={'Player card blackjack'}
+                                />
+                            );
+                        })}
+                </div>
             </div>
             <div className={styles.uRcenterOfUniverse}>
-                <div className={styles.myDeck}>
+                <div className={styles.Deck}>
                     {cards
                         .find((player) => player.nickName === nickName)
                         ?.cards.map(({ cardID }: Card) => {
