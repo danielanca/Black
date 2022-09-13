@@ -1,4 +1,8 @@
+ 
+![960x0](https://user-images.githubusercontent.com/26521658/189870533-3933d988-03c5-40ec-b605-e27a6a1e2eac.jpg)
+
 React Project challenge.
+[The project is stil in development]
 
 1. Build BlackJack game with 2 players playing
 
@@ -16,3 +20,5 @@ What I did so far: [Backend End]
 
 Planning:
  Full flow of gameplay, game sounds and room chats.
+ 
+
