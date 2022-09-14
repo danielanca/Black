@@ -2,6 +2,7 @@ import styles from './Gameplay.module.scss';
 import { cardImageLoad } from '../../Cards/cardsLoad';
 import { useContext, useState, useEffect } from 'react';
 import { Context } from './../LandingPage';
+import { Socket } from 'socket.io-client';
 
 interface GameplayProps {
    playerInfo: {
@@ -28,7 +29,7 @@ const Gameplay = ({ playerInfo, cards, setCards }: GameplayProps) => {
    const ourContext = useContext(Context);
    const { nickName, roomChannel } = playerInfo;
    const opponent = cards.find((player) => player.nickName !== nickName)?.nickName;
-   console.log('GAMEPLAY:', nickName);
+   const [winnerAnnounce, setWinnerAnnounce] = useState<string>('');
 
    const fireAction = (event: string) => {
       ourContext.socket.emit(
@@ -45,13 +46,26 @@ const Gameplay = ({ playerInfo, cards, setCards }: GameplayProps) => {
          if (data.message === 'CARD_INCOMING') {
             setCards(data.card);
          }
+         //ourContext.socket.off('playerCards');
       });
 
       ourContext.socket.on('playerCards', (data: any) => {
          console.log('playerCards:', data);
          let cardsPlayerIncoming: CardsPlayers[] = JSON.parse(data.payload);
-
+         //  ourContext.socket.off('playerCards');
          setCards(cardsPlayerIncoming);
+      });
+
+      ourContext.socket.on('GAME_FINISHED', (data: any) => {
+         let gameWinner = data.payload;
+         console.log('FIRED', gameWinner.message);
+
+         setWinnerAnnounce(` ${gameWinner.players[0].nickName} ${gameWinner.message}`);
+         //  console.log(
+         //     'Winner is:',
+         //     JSON.parse(JSON.parse(JSON.parse(JSON.stringify(data)).winner).winnerData)
+         //        .nickName
+         //  );
       });
    }, [ourContext.socket]);
 
@@ -81,6 +95,7 @@ const Gameplay = ({ playerInfo, cards, setCards }: GameplayProps) => {
          ) : cards.find((player) => player.nickName === nickName)?.myTurn === 'NO_MORE' ? (
             <div className={styles.middleMessage}>
                <h3>{'Game ended'}</h3>
+               <h3>{winnerAnnounce}</h3>
             </div>
          ) : (
             ''
