@@ -2,7 +2,7 @@ import styles from './Gameplay.module.scss';
 import { cardImageLoad } from '../../Cards/cardsLoad';
 import { useContext, useState, useEffect } from 'react';
 import { Context } from './../LandingPage';
-import { Socket } from 'socket.io-client';
+import pokerCard from './../../pokerCard.mp3';
 
 interface GameplayProps {
    playerInfo: {
@@ -24,7 +24,7 @@ type CardsPlayers = {
    dealer?: string;
    myTurn?: string;
 };
-
+const audio = new Audio(pokerCard);
 const Gameplay = ({ playerInfo, cards, setCards }: GameplayProps) => {
    const ourContext = useContext(Context);
    const { nickName, roomChannel } = playerInfo;
@@ -32,6 +32,7 @@ const Gameplay = ({ playerInfo, cards, setCards }: GameplayProps) => {
    const [winnerAnnounce, setWinnerAnnounce] = useState<string>('');
 
    const fireAction = (event: string) => {
+      audio.play();
       ourContext.socket.emit(
          'EVENT_ACTION',
          JSON.stringify({ nickName, roomChannel, actionEvent: event })
@@ -42,13 +43,6 @@ const Gameplay = ({ playerInfo, cards, setCards }: GameplayProps) => {
       ourContext.socket.emit('PLAYER_READY', { initialState: true, playerInfo });
    }, []);
    useEffect(() => {
-      ourContext.socket.on('SERVER_INCOMING', (data: any) => {
-         if (data.message === 'CARD_INCOMING') {
-            setCards(data.card);
-         }
-         //ourContext.socket.off('playerCards');
-      });
-
       ourContext.socket.on('playerCards', (data: any) => {
          console.log('playerCards:', data);
          let cardsPlayerIncoming: CardsPlayers[] = JSON.parse(data.payload);
@@ -60,11 +54,6 @@ const Gameplay = ({ playerInfo, cards, setCards }: GameplayProps) => {
          console.log('FIRED', gameWinner.message);
 
          setWinnerAnnounce(` ${gameWinner.players[0].nickName} ${gameWinner.message}`);
-         //  console.log(
-         //     'Winner is:',
-         //     JSON.parse(JSON.parse(JSON.parse(JSON.stringify(data)).winner).winnerData)
-         //        .nickName
-         //  );
       });
    }, [ourContext.socket]);
 
@@ -91,10 +80,16 @@ const Gameplay = ({ playerInfo, cards, setCards }: GameplayProps) => {
             <div className={styles.middleMessage}>
                <h3>{'Waiting for your opponent ...'}</h3>
             </div>
-         ) : cards.find((player) => player.nickName === nickName)?.myTurn === 'NO_MORE' ? (
+         ) : cards.find((player) => player.nickName === nickName)?.myTurn === 'NO_MORE' &&
+           cards.find((player) => player.nickName !== nickName)?.myTurn != 'YES' ? (
             <div className={styles.middleMessage}>
                <h3>{'Game ended'}</h3>
                <h3>{winnerAnnounce}</h3>
+            </div>
+         ) : cards.find((player) => player.nickName === nickName)?.myTurn === 'NO_MORE' &&
+           cards.find((player) => player.nickName !== nickName)?.myTurn === 'YES' ? (
+            <div className={styles.middleMessage}>
+               <h3>{'Waiting for your opponent ...'}</h3>
             </div>
          ) : (
             ''

@@ -1,6 +1,5 @@
-import io from 'socket.io-client';
-import { useEffect, useState, useContext, createContext } from 'react';
-import { PlayerProps, WelcomeProps } from './../../PropTypes/types';
+import { useEffect, useState, useContext } from 'react';
+import { WelcomeProps } from './../../PropTypes/types';
 import { setCookie, getCookie } from '../../SendRequest/functions';
 import { Context } from '../LandingPage';
 import styles from './Welcome.module.scss';
@@ -9,17 +8,7 @@ interface playersListProps {
    nickName: string;
    channelRoom: string;
 }
-type Card = {
-   cardID: string;
-   cardValue: number;
-};
-type CardsPlayers = {
-   socketID: string;
-   nickName: string;
-   cards: Card[];
-   dealer?: string;
-   myTurn?: string;
-};
+
 const getExistingNickName = () => {
    let credentialsSaved = getCookie('blackJackDaniel');
    if (credentialsSaved) {
@@ -32,7 +21,6 @@ const getExistingNickName = () => {
 const getExistingRoomChannel = () => {
    let credentialsSaved = getCookie('blackJackDaniel');
    if (credentialsSaved) {
-      // console.log('Credentials in Cookie:', credentialsSaved);
       var { roomChannel } = JSON.parse(credentialsSaved);
       return roomChannel;
    } else {
@@ -51,7 +39,6 @@ const Welcome = ({ eventHandler, playerData, setPlayerData }: WelcomeProps) => {
    };
 
    const pickPlayerToPlay = ({
-      friendName,
       friendChannel,
    }: {
       friendName: string;
