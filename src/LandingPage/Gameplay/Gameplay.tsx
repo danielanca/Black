@@ -52,7 +52,6 @@ const Gameplay = ({ playerInfo, cards, setCards }: GameplayProps) => {
       ourContext.socket.on('playerCards', (data: any) => {
          console.log('playerCards:', data);
          let cardsPlayerIncoming: CardsPlayers[] = JSON.parse(data.payload);
-         //  ourContext.socket.off('playerCards');
          setCards(cardsPlayerIncoming);
       });
 

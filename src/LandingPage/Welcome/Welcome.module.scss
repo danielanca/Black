@@ -1,47 +1,65 @@
-.createTableBtn{
-    width: 300px;
-    background-color: rgb(128, 0, 0);
-    color: white;
-    font-weight: bolder;
-    min-height: 40px;
-    margin: 5px;
-    font-size: 20px;
-    border-radius: 5px;
-    cursor: pointer;
-    :hover{
-        background-color: rgb(7, 173, 7);
-        color: black;
-    }
+.createTableBtn {
+   width: 300px;
+   background-color: rgb(128, 0, 0);
+   color: white;
+   font-weight: bolder;
+   min-height: 40px;
+   margin: 5px;
+   font-size: 20px;
+   border-radius: 5px;
+   cursor: pointer;
+   :hover {
+      background-color: rgb(7, 173, 7);
+      color: black;
+   }
 }
 
-.joinTableBtn{
-    @extend .createTableBtn;
-    background-color: rgb(6, 151, 196);
+.joinTableBtn {
+   @extend .createTableBtn;
+   background-color: rgb(6, 151, 196);
 }
 
-.inputNickname{
-    border-radius: 3px;
-    min-width: 200px;
-    min-height: 30px;
-    margin: 10px 5px;
-    font-weight: bolder;
-    padding: 0 10px;
+.inputNickname {
+   border-radius: 3px;
+   min-width: 200px;
+   min-height: 30px;
+   margin: 10px 5px;
+   font-weight: bolder;
+   padding: 0 10px;
 }
 
-.detailsText{
-    font-size: 10px;
-    font-weight: bold;
+.detailsText {
+   font-size: 10px;
+   font-weight: bold;
 }
-.onlineList{
-    width: 300px;
-    margin-top: 20px;
-    border: 1px solid white;
-    min-height: 120px;
-    p{
-        padding: 0;
-        margin: 0;
-        font-weight: bold;
-        font-family:'Courier New', Courier, monospace;
-        text-align: center;
-    }
+.onlineList {
+   width: 100%;
+   max-width: 485px;
+   margin-top: 20px;
+   border: 1px solid white;
+   min-height: 120px;
+
+   p {
+      padding: 0;
+      margin: 0;
+      font-weight: bold;
+      font-family: 'Courier New', Courier, monospace;
+      text-align: center;
+   }
+}
+.tableStyle {
+   display: flex;
+   justify-content: center;
+}
+.joinButton {
+   background-color: green;
+   outline: green;
+   color: white;
+   font-weight: bold;
+   width: 150px;
+   height: 40px;
+   cursor: pointer;
+   &:hover {
+      opacity: 0.77;
+   }
 }

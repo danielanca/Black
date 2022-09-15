@@ -39,13 +39,7 @@ const getExistingRoomChannel = () => {
       return '';
    }
 };
-const Welcome = ({
-   eventHandler,
-   playerData,
-   setPlayerData,
-   cards,
-   setCards,
-}: WelcomeProps) => {
+const Welcome = ({ eventHandler, playerData, setPlayerData }: WelcomeProps) => {
    const ourContext = useContext(Context);
 
    const [playersOnLabel, setPlayersOnLabel] = useState<playersListProps[]>([]);
@@ -56,24 +50,24 @@ const Welcome = ({
       setPlayerData((playerData) => ({ ...playerData, [name]: value }));
    };
 
+   const pickPlayerToPlay = ({
+      friendName,
+      friendChannel,
+   }: {
+      friendName: string;
+      friendChannel: string;
+   }) => {
+      setPlayerData((playerData) => ({ ...playerData, roomChannel: friendChannel }));
+      if (playerData.nickName != '') {
+         joinRoom();
+      } else {
+         alert('Please enter your name first');
+      }
+   };
+
    useEffect(() => {
       ourContext.socket.emit('howManyPlayers');
    }, []);
-
-   useEffect(() => {
-      // ourContext.socket.on('playerCards', (data: any) => {
-      //     let cardsPlayerIncoming: CardsPlayers[] = JSON.parse(data.payload);
-      //     if (typeof cardsPlayerIncoming != 'undefined') {
-      //         let theTurn = cardsPlayerIncoming.find(
-      //             (player) => player.nickName === playerData.nickName
-      //         )?.myTurn;
-      //         console.log('THE TURN IS:', theTurn, playerData.nickName);
-      //         // setMyTurn(instanceof theTurn != undefined ? theTurn : 'NO');
-      //     }
-      //     console.log('DA DA from WELCOME', JSON.stringify(data));
-      //     setCards(cardsPlayerIncoming);
-      // });
-   }, [ourContext.socket]);
 
    useEffect(() => {
       ourContext.socket.on('roomJoinStatus', (data: any) => {
@@ -105,10 +99,6 @@ const Welcome = ({
    }, [ourContext.socket]);
 
    useEffect(() => {
-      // console.log(`  [Welcome] PlayerData changed!`, playerData);
-   }, [playerData]);
-
-   useEffect(() => {
       if (getExistingNickName() !== '') {
          setPlayerData((playerData) => ({
             ...playerData,
@@ -130,8 +120,6 @@ const Welcome = ({
             roomChannel: playerData.roomChannel,
             nickName: playerData.nickName,
          });
-      } else {
-         // console.log('THERE IS NO ROOM SPECIFICATION');
       }
    };
 
@@ -164,23 +152,34 @@ const Welcome = ({
          <button onClick={joinRoom} className={styles.createTableBtn}>
             {'JoinChannel'}
          </button>
-         {/* <button onClick={sendMessage} className={styles.joinTableBtn}>{'Join channel'}</button> */}
 
          <button onClick={getPlayers} className={styles.joinTableBtn}>
             {'Get players'}
          </button>
          <div className={styles.onlineList}>
             <p>{`Players online:`}</p>
-            <table>
+            <table className={styles.tableStyle}>
                <thead>
                   <tr>
-                     <th>Nickname</th>
-                     <th>Channel #</th>
+                     <th style={{ minWidth: '145px' }}>Nickname</th>
+                     <th style={{ minWidth: '145px' }}>Channel #</th>
+                     <th style={{ minWidth: '145px' }}>Action</th>
                   </tr>
                   {playersOnLabel.map((item) => (
                      <tr>
-                        <td>{item.nickName}</td>
-                        <td>{item.channelRoom}</td>
+                        <td style={{ minWidth: '145px' }}>{item.nickName}</td>
+                        <td style={{ minWidth: '145px' }}>{item.channelRoom}</td>
+                        <td style={{ minWidth: '145px' }}>
+                           <button
+                              className={styles.joinButton}
+                              onClick={pickPlayerToPlay.bind(1, {
+                                 friendName: item.nickName,
+                                 friendChannel: item.channelRoom,
+                              })}
+                           >
+                              {'JOIN'}
+                           </button>
+                        </td>
                      </tr>
                   ))}
                </thead>
