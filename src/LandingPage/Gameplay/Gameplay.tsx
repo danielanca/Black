@@ -45,6 +45,8 @@ const Gameplay = ({ playerInfo, cards, setCards }: GameplayProps) => {
    useEffect(() => {
       ourContext.socket.on('playerCards', (data: any) => {
          console.log('playerCards:', data);
+         if (typeof data.restart !== 'undefined') {
+         }
          let cardsPlayerIncoming: CardsPlayers[] = JSON.parse(data.payload);
          setCards(cardsPlayerIncoming);
       });
@@ -56,6 +58,13 @@ const Gameplay = ({ playerInfo, cards, setCards }: GameplayProps) => {
          setWinnerAnnounce(` ${gameWinner.players[0].nickName} ${gameWinner.message}`);
       });
    }, [ourContext.socket]);
+
+   const restartGameRequest = () => {
+      ourContext.socket.emit('restartGame', {
+         requestNickname: playerInfo.nickName,
+         requestChannel: playerInfo.roomChannel,
+      });
+   };
 
    return (
       <div className={styles.gameContainer}>
@@ -85,11 +94,19 @@ const Gameplay = ({ playerInfo, cards, setCards }: GameplayProps) => {
             <div className={styles.middleMessage}>
                <h3>{'Game ended'}</h3>
                <h3>{winnerAnnounce}</h3>
+               <button onClick={restartGameRequest} className={styles.restartButton}>
+                  {'Restart'}
+               </button>
             </div>
          ) : cards.find((player) => player.nickName === nickName)?.myTurn === 'NO_MORE' &&
            cards.find((player) => player.nickName !== nickName)?.myTurn === 'YES' ? (
             <div className={styles.middleMessage}>
                <h3>{'Waiting for your opponent ...'}</h3>
+            </div>
+         ) : cards.find((player) => player.nickName === nickName)?.myTurn ===
+           'NO_EXCEEDED' ? (
+            <div className={styles.middleMessage}>
+               <h3 style={{ color: 'red' }}>{'Cards exceeded 21'}</h3>
             </div>
          ) : (
             ''

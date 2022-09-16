@@ -83,7 +83,7 @@
 .middleMessage {
    position: absolute;
    transform: translate(-50%, 0%);
-   top: 50%;
+   top: 40%;
    left: 50%;
    font-size: 30px;
    font-weight: bold;
@@ -91,4 +91,13 @@
    h3 {
       font-size: 21px;
    }
+}
+
+.restartButton {
+   width: 300px;
+   height: 46px;
+   font-weight: bold;
+   font-size: 20px;
+   color: white;
+   background-color: #007eff;
 }
