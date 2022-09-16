@@ -3,7 +3,7 @@ import { WelcomeProps } from './../../PropTypes/types';
 import { setCookie, getCookie } from '../../SendRequest/functions';
 import { Context } from '../LandingPage';
 import styles from './Welcome.module.scss';
-
+import { strings } from '../../constants/strings';
 interface playersListProps {
    nickName: string;
    channelRoom: string;
@@ -110,13 +110,10 @@ const Welcome = ({ eventHandler, playerData, setPlayerData }: WelcomeProps) => {
       }
    };
 
-   const getPlayers = () => {
-      ourContext.socket.emit('howManyPlayers');
-   };
    return (
       <>
-         <h2>{'Welcome to BlackJack Game!'} </h2>
-         <label htmlFor="nameInput">{'NickName'}</label>
+         <h2>{strings.welcomeMessage} </h2>
+         <label htmlFor="nameInput">{strings.nickName}</label>
          <input
             className={styles.inputNickname}
             value={playerData.nickName}
@@ -124,7 +121,7 @@ const Welcome = ({ eventHandler, playerData, setPlayerData }: WelcomeProps) => {
             name="nickName"
             type={'input'}
          />
-         <label htmlFor="roomInput">{'Room Channel:'}</label>
+         <label htmlFor="roomInput">{strings.roomChannel}</label>
          <label
             className={styles.detailsText}
             htmlFor="roomInput"
@@ -137,14 +134,11 @@ const Welcome = ({ eventHandler, playerData, setPlayerData }: WelcomeProps) => {
             type={'input'}
          />
          <button onClick={joinRoom} className={styles.createTableBtn}>
-            {'JoinChannel'}
+            {strings.joinChannel}
          </button>
 
-         <button onClick={getPlayers} className={styles.joinTableBtn}>
-            {'Get players'}
-         </button>
          <div className={styles.onlineList}>
-            <p>{`Players online:`}</p>
+            <p>{strings.playersOnline}</p>
             <table className={styles.tableStyle}>
                <thead>
                   <tr>
@@ -164,7 +158,7 @@ const Welcome = ({ eventHandler, playerData, setPlayerData }: WelcomeProps) => {
                                  friendChannel: item.channelRoom,
                               })}
                            >
-                              {'JOIN'}
+                              {strings.joinButton}
                            </button>
                         </td>
                      </tr>

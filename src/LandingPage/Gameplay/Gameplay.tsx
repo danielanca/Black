@@ -3,27 +3,8 @@ import { cardImageLoad } from '../../Cards/cardsLoad';
 import { useContext, useState, useEffect } from 'react';
 import { Context } from './../LandingPage';
 import pokerCard from './../../pokerCard.mp3';
-
-interface GameplayProps {
-   playerInfo: {
-      nickName: string;
-      roomChannel: string;
-   };
-   cards: CardsPlayers[];
-   setCards: React.Dispatch<React.SetStateAction<CardsPlayers[]>>;
-   myTurn?: string;
-}
-type Card = {
-   cardID: string;
-   cardValue: number;
-};
-type CardsPlayers = {
-   socketID: string;
-   nickName: string;
-   cards: Card[];
-   dealer?: string;
-   myTurn?: string;
-};
+import { GameplayProps, CardsPlayers, Card } from '../../PropTypes/types';
+import { strings } from '../../constants/strings';
 const audio = new Audio(pokerCard);
 const Gameplay = ({ playerInfo, cards, setCards }: GameplayProps) => {
    const ourContext = useContext(Context);
@@ -40,9 +21,6 @@ const Gameplay = ({ playerInfo, cards, setCards }: GameplayProps) => {
    };
 
    useEffect(() => {
-      ourContext.socket.emit('PLAYER_READY', { initialState: true, playerInfo });
-   }, []);
-   useEffect(() => {
       ourContext.socket.on('playerCards', (data: any) => {
          console.log('playerCards:', data);
          if (typeof data.restart !== 'undefined') {
@@ -53,8 +31,6 @@ const Gameplay = ({ playerInfo, cards, setCards }: GameplayProps) => {
 
       ourContext.socket.on('GAME_FINISHED', (data: any) => {
          let gameWinner = data.payload;
-         console.log('FIRED', gameWinner.message);
-
          setWinnerAnnounce(` ${gameWinner.players[0].nickName} ${gameWinner.message}`);
       });
    }, [ourContext.socket]);
@@ -73,21 +49,21 @@ const Gameplay = ({ playerInfo, cards, setCards }: GameplayProps) => {
             <h4 className={styles.roomName}>{`Opponent: ${
                typeof opponent === 'undefined' ? 'no-one' : opponent
             }`}</h4>
-            <p className={styles.nickStyle}>{`Nickname: ${nickName}`}</p>
+            <p className={styles.nickStyle}>{`${strings.nickName} ${nickName}`}</p>
          </div>
 
          {cards.find((player) => player.nickName === nickName)?.myTurn === 'YES' ? (
             <div className={styles.controls}>
                <button onClick={fireAction.bind(1, 'HIT')} className={styles.hitButton}>
-                  {'HIT'}
+                  {strings.buttonsAction.hit}
                </button>
                <button onClick={fireAction.bind(1, 'STAY')} className={styles.stayButton}>
-                  {'STAY'}
+                  {strings.buttonsAction.stand}
                </button>
             </div>
          ) : cards.find((player) => player.nickName === nickName)?.myTurn === 'NO' ? (
             <div className={styles.middleMessage}>
-               <h3>{'Waiting for your opponent ...'}</h3>
+               <h3>{strings.waitForOpponent}</h3>
             </div>
          ) : cards.find((player) => player.nickName === nickName)?.myTurn === 'NO_MORE' &&
            cards.find((player) => player.nickName !== nickName)?.myTurn != 'YES' ? (
@@ -101,12 +77,12 @@ const Gameplay = ({ playerInfo, cards, setCards }: GameplayProps) => {
          ) : cards.find((player) => player.nickName === nickName)?.myTurn === 'NO_MORE' &&
            cards.find((player) => player.nickName !== nickName)?.myTurn === 'YES' ? (
             <div className={styles.middleMessage}>
-               <h3>{'Waiting for your opponent ...'}</h3>
+               <h3>{strings.waitForOpponent}</h3>
             </div>
          ) : cards.find((player) => player.nickName === nickName)?.myTurn ===
            'NO_EXCEEDED' ? (
             <div className={styles.middleMessage}>
-               <h3 style={{ color: 'red' }}>{'Cards exceeded 21'}</h3>
+               <h3 style={{ color: 'red' }}>{strings.cardsExceeded}</h3>
             </div>
          ) : (
             ''
