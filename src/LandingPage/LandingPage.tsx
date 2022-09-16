@@ -19,7 +19,7 @@ type CardsPlayers = {
    dealer?: string;
    myTurn?: string;
 };
-const socket = io('https://blackjackdanielback.herokuapp.com:8999');
+const socket = io('https://blackjackdanielback.herokuapp.com');
 
 export const Context = createContext({ socket });
 
