@@ -49,7 +49,7 @@ const Gameplay = ({ playerInfo, cards, setCards }: GameplayProps) => {
             <h4 className={styles.roomName}>{`Opponent: ${
                typeof opponent === 'undefined' ? 'no-one' : opponent
             }`}</h4>
-            <p className={styles.nickStyle}>{`${strings.nickName} ${nickName}`}</p>
+            <p className={styles.nickStyle}>{`${strings.nickName}: ${nickName}`}</p>
          </div>
 
          {cards.find((player) => player.nickName === nickName)?.myTurn === 'YES' ? (
