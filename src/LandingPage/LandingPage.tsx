@@ -3,8 +3,7 @@ import { useEffect, useState, createContext } from 'react';
 import { ConnectionProps } from './../PropTypes/types';
 import Gameplay from './Gameplay/Gameplay';
 import Welcome from './Welcome/Welcome';
-const localHost = 'http://localhost:8999';
-//const localHost = 'http://localhost:8999';
+const localHost = 'https://blackjackancabackend.herokuapp.com/';
 interface PlayerProps {
    nickName: string;
    roomChannel: string;
